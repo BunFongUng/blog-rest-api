@@ -26,3 +26,38 @@ export async function create(req, res) {
     });
   }
 }
+
+export async function list(req, res) {
+  try {
+    let posts = await Post.find({ creator: req.user._id });
+    return res.json({
+      status: 'success',
+      data: posts,
+      error: null
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 'error',
+      data: null,
+      error: err
+    });
+  }
+}
+
+export async function get(req, res) {
+  try {
+    let postId = req.params.id;
+    let post = await Post.findOne({
+      _id: postId,
+      creator: req.user._id
+    });
+
+    if(!post) return Promise.reject();
+  } catch (err) {
+    return res.status(400).json({
+      status: 'error',
+      data: null,
+      error: err
+    });
+  }
+}

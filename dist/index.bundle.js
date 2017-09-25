@@ -355,7 +355,7 @@ const postSchema = new _mongoose.Schema({
     minlength: 3,
     unique: true
   },
-  title: {
+  text: {
     type: String,
     trim: true,
     required: true,
@@ -552,6 +552,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.create = create;
+exports.list = list;
+exports.get = get;
 
 var _lodash = __webpack_require__(3);
 
@@ -579,6 +581,41 @@ async function create(req, res) {
       data: post,
       error: null
     });
+  } catch (err) {
+    return res.status(400).json({
+      status: 'error',
+      data: null,
+      error: err
+    });
+  }
+}
+
+async function list(req, res) {
+  try {
+    let posts = await _post2.default.find({ creator: req.user._id });
+    return res.json({
+      status: 'success',
+      data: posts,
+      error: null
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 'error',
+      data: null,
+      error: err
+    });
+  }
+}
+
+async function get(req, res) {
+  try {
+    let postId = req.params.id;
+    let post = await _post2.default.findOne({
+      _id: postId,
+      creator: req.user._id
+    });
+
+    if (!post) return Promise.reject();
   } catch (err) {
     return res.status(400).json({
       status: 'error',
@@ -621,6 +658,8 @@ const routes = (0, _express.Router)();
 
 routes.post('/', helpers.authentication, _post3.default.create, postController.create);
 
+routes.get('/', helpers.authentication, postController.list);
+
 exports.default = routes;
 
 /***/ }),
@@ -648,8 +687,10 @@ exports.default = {
       if (!post) {
         return title;
       }
+
+      throw new Error(`${title} already in used.`);
     });
-  }), (0, _check.check)('text', 'Text is required').exists()]
+  }), (0, _check.check)('title').isLength(3).withMessage('Title must be 3 character long.'), (0, _check.check)('text', 'Text is required').exists(), (0, _check.check)('text').isLength(10).withMessage('Text must be 10 character long.')]
 };
 
 /***/ }),

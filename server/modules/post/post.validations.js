@@ -8,8 +8,12 @@ export default {
         if(!post) {
           return title;
         }
+
+        throw new Error(`${title} already in used.`);
       });
     }),
+    check('title').isLength(3).withMessage('Title must be 3 character long.'),
     check('text', 'Text is required').exists(),
+    check('text').isLength(10).withMessage('Text must be 10 character long.')
   ],
 }

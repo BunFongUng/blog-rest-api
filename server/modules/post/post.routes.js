@@ -10,4 +10,6 @@ const routes = Router();
 
 routes.post('/', helpers.authentication, postValidations.create, postController.create);
 
+routes.get('/', helpers.authentication, postController.list);
+
 export default routes;

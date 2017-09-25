@@ -10,7 +10,7 @@ const postSchema = new Schema({
     minlength: 3,
     unique: true
   },
-  title: {
+  text: {
     type: String,
     trim: true,
     required: true,
