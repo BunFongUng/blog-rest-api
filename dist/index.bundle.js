@@ -554,6 +554,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.create = create;
 exports.list = list;
 exports.get = get;
+exports._delete = _delete;
+exports.update = update;
 
 var _lodash = __webpack_require__(3);
 
@@ -616,6 +618,49 @@ async function get(req, res) {
     });
 
     if (!post) return Promise.reject();
+
+    return res.json({
+      status: 'succes',
+      data: post,
+      error: null
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 'error',
+      data: null,
+      error: err
+    });
+  }
+}
+
+async function _delete(req, res) {
+  try {
+    let postId = req.params.id;
+    let post = await _post2.default.findOneAndRemove({
+      _id: postId,
+      creator: req.user._id
+    });
+
+    if (!post) return Promise.reject();
+
+    return res.json({
+      status: 'error',
+      data: post,
+      error: null
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 'error',
+      data: null,
+      error: err
+    });
+  }
+}
+
+async function update(req, res) {
+  try {
+    let postId = req.params.id;
+    let body = _lodash2.default.pick(req.body, ['']);
   } catch (err) {
     return res.status(400).json({
       status: 'error',
@@ -659,6 +704,12 @@ const routes = (0, _express.Router)();
 routes.post('/', helpers.authentication, _post3.default.create, postController.create);
 
 routes.get('/', helpers.authentication, postController.list);
+
+routes.get('/:id', helpers.authentication, postController.get);
+
+routes.delete('/:id', helpers.authentication, postController._delete);
+
+routes.put('/:id', helpers.authentication, postController.update);
 
 exports.default = routes;
 

@@ -12,4 +12,10 @@ routes.post('/', helpers.authentication, postValidations.create, postController.
 
 routes.get('/', helpers.authentication, postController.list);
 
+routes.get('/:id', helpers.authentication, postController.get);
+
+routes.delete('/:id', helpers.authentication, postController._delete);
+
+routes.put('/:id', helpers.authentication, postController.update);
+
 export default routes;
