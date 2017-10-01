@@ -156,17 +156,30 @@ userSchema.methods.generateAuthToken = function () {
 	let user = this;
 	let access = 'auth';
 
-	let token = _jsonwebtoken2.default.sign({
+	_jsonwebtoken2.default.sign({
 		_id: user._id,
 		access
-	}, process.env.SECRET_KEY);
+	}, process.env.SECRET_KEY, (err, token) => {
+		if (err) throw new Error(err);
+		user.tokens.push({
+			access,
+			token
+		});
 
-	user.tokens.push({
-		access,
-		token
+		return user.save().then(() => token);
 	});
 
-	return user.save().then(() => token);
+	// let token = jwt.sign({
+	// 	_id: user._id,
+	// 	access,
+	// }, process.env.SECRET_KEY);
+
+	// user.tokens.push({
+	// 	access,
+	// 	token
+	// });
+
+	// return user.save().then(() => token);
 };
 
 userSchema.statics.findByToken = function (token) {
