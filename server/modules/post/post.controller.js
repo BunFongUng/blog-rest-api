@@ -29,7 +29,12 @@ export async function create(req, res) {
 
 export async function list(req, res) {
   try {
-    let posts = await Post.find({ creator: req.user._id });
+    let skip = parseInt(req.query.skip);
+    let limit = parseInt(req.query.limit);
+    let posts = await Post.find({ creator: req.user._id })
+                          .sort({ createdAt: -1 })
+                          .skip(skip)
+                          .limit(limit);
     return res.json({
       status: 'success',
       data: posts,
@@ -74,7 +79,7 @@ export async function _delete(req, res) {
     let post = await Post.findOneAndRemove({
       _id: postId,
       creator: req.user._id
-    })
+    });
 
     if(!post) return Promise.reject();
 

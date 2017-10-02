@@ -156,30 +156,30 @@ userSchema.methods.generateAuthToken = function () {
 	let user = this;
 	let access = 'auth';
 
-	_jsonwebtoken2.default.sign({
-		_id: user._id,
-		access
-	}, process.env.SECRET_KEY, (err, token) => {
-		if (err) throw new Error(err);
-		user.tokens.push({
-			access,
-			token
-		});
-
-		return user.save().then(() => token);
-	});
-
-	// let token = jwt.sign({
+	// jwt.sign({
 	// 	_id: user._id,
 	// 	access,
-	// }, process.env.SECRET_KEY);
+	// }, process.env.SECRET_KEY, (err, token) => {
+	//   if (err) throw new Error(err);
+	//   user.tokens.push({
+	//     access,
+	//     token
+	//   });
 
-	// user.tokens.push({
-	// 	access,
-	// 	token
+	//   return user.save().then(() => token);
 	// });
 
-	// return user.save().then(() => token);
+	let token = _jsonwebtoken2.default.sign({
+		_id: user._id,
+		access
+	}, process.env.SECRET_KEY);
+
+	user.tokens.push({
+		access,
+		token
+	});
+
+	return user.save().then(() => token);
 };
 
 userSchema.statics.findByToken = function (token) {
@@ -607,7 +607,9 @@ async function create(req, res) {
 
 async function list(req, res) {
   try {
-    let posts = await _post2.default.find({ creator: req.user._id });
+    let skip = parseInt(req.query.skip);
+    let limit = parseInt(req.query.limit);
+    let posts = await _post2.default.find({ creator: req.user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit);
     return res.json({
       status: 'success',
       data: posts,
