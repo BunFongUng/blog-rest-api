@@ -33,7 +33,6 @@ export async function list(req, res) {
     let limit = parseInt(req.query.limit);
     let search = req.query.search;
     let posts;
-    // , {'creator': req.user._id}
 
     if(search) {
       posts = await Post.find({ $and:[ { 'title': new RegExp(search, "i") }, { 'creator': req.user._id } ]})
