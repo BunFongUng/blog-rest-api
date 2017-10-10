@@ -33,7 +33,7 @@ export async function list(req, res) {
     let skip = parseInt(req.query.skip);
     let limit = parseInt(req.query.limit);
     let search = req.query.search;
-    let posts;
+    let posts, total;
 
     if (search) {
       posts = await Post.find({
@@ -42,16 +42,22 @@ export async function list(req, res) {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
+
+      total = posts.length;
+
     } else {
       posts = await Post.find({ creator: req.user._id })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
+
+      total = await Post.find({ creator: req.user._id }).count();
     }
 
     return res.json({
       status: "success",
       data: posts,
+      total,
       error: null
     });
   } catch (err) {

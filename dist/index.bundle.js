@@ -588,17 +588,17 @@ async function create(req, res) {
 
     if (!errors.isEmpty()) return res.status(422).json({ errors: errors.mapped() });
 
-    let body = _lodash2.default.pick(req.body, ['title', 'text']);
+    let body = _lodash2.default.pick(req.body, ["title", "text"]);
     body.creator = req.user._id;
     let post = await _post2.default.create(body);
     return res.json({
-      status: 'success',
+      status: "success",
       data: post,
       error: null
     });
   } catch (err) {
     return res.status(400).json({
-      status: 'error',
+      status: "error",
       data: null,
       error: err
     });
@@ -610,22 +610,29 @@ async function list(req, res) {
     let skip = parseInt(req.query.skip);
     let limit = parseInt(req.query.limit);
     let search = req.query.search;
-    let posts;
+    let posts, total;
 
     if (search) {
-      posts = await _post2.default.find({ $and: [{ 'title': new RegExp(search, "i") }, { 'creator': req.user._id }] }).sort({ createdAt: -1 }).skip(skip).limit(limit);
+      posts = await _post2.default.find({
+        $and: [{ title: new RegExp(search, "i") }, { creator: req.user._id }]
+      }).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+      total = posts.length;
     } else {
-      posts = await _post2.default.find({ 'creator': req.user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit);
+      posts = await _post2.default.find({ creator: req.user._id }).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+      total = await _post2.default.find({ creator: req.user._id }).count();
     }
 
     return res.json({
-      status: 'success',
+      status: "success",
       data: posts,
+      total,
       error: null
     });
   } catch (err) {
     return res.status(400).json({
-      status: 'error',
+      status: "error",
       data: null,
       error: err
     });
@@ -643,13 +650,13 @@ async function get(req, res) {
     if (!post) return Promise.reject();
 
     return res.json({
-      status: 'succes',
+      status: "succes",
       data: post,
       error: null
     });
   } catch (err) {
     return res.status(400).json({
-      status: 'error',
+      status: "error",
       data: null,
       error: err
     });
@@ -667,13 +674,13 @@ async function _delete(req, res) {
     if (!post) return Promise.reject();
 
     return res.json({
-      status: 'success',
+      status: "success",
       data: post,
       error: null
     });
   } catch (err) {
     return res.status(400).json({
-      status: 'error',
+      status: "error",
       data: null,
       error: err
     });
@@ -683,10 +690,10 @@ async function _delete(req, res) {
 async function update(req, res) {
   try {
     let postId = req.params.id;
-    let body = _lodash2.default.pick(req.body, ['']);
+    let body = _lodash2.default.pick(req.body, [""]);
   } catch (err) {
     return res.status(400).json({
-      status: 'error',
+      status: "error",
       data: null,
       error: err
     });
