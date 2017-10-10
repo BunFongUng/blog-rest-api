@@ -1,26 +1,27 @@
-import _ from 'lodash';
+import _ from "lodash";
 
-import { validationResult } from 'express-validator/check';
+import { validationResult } from "express-validator/check";
 
-import Post from './post.model';
+import Post from "./post.model";
 
 export async function create(req, res) {
   try {
     let errors = validationResult(req);
 
-    if (!errors.isEmpty()) return res.status(422).json({ errors: errors.mapped() });
+    if (!errors.isEmpty())
+      return res.status(422).json({ errors: errors.mapped() });
 
-    let body = _.pick(req.body, ['title', 'text']);
-        body.creator = req.user._id;
+    let body = _.pick(req.body, ["title", "text"]);
+    body.creator = req.user._id;
     let post = await Post.create(body);
     return res.json({
-      status: 'success',
+      status: "success",
       data: post,
       error: null
     });
   } catch (err) {
     return res.status(400).json({
-      status: 'error',
+      status: "error",
       data: null,
       error: err
     });
@@ -34,26 +35,28 @@ export async function list(req, res) {
     let search = req.query.search;
     let posts;
 
-    if(search) {
-      posts = await Post.find({ $and:[ { 'title': new RegExp(search, "i") }, { 'creator': req.user._id } ]})
-                        .sort({ createdAt: -1 })
-                        .skip(skip)
-                        .limit(limit);
+    if (search) {
+      posts = await Post.find({
+        $and: [{ title: new RegExp(search, "i") }, { creator: req.user._id }]
+      })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
     } else {
-      posts = await Post.find({'creator': req.user._id})
-                        .sort({ createdAt: -1 })
-                        .skip(skip)
-                        .limit(limit);
+      posts = await Post.find({ creator: req.user._id })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
     }
 
     return res.json({
-      status: 'success',
+      status: "success",
       data: posts,
       error: null
     });
   } catch (err) {
     return res.status(400).json({
-      status: 'error',
+      status: "error",
       data: null,
       error: err
     });
@@ -68,16 +71,16 @@ export async function get(req, res) {
       creator: req.user._id
     });
 
-    if(!post) return Promise.reject();
+    if (!post) return Promise.reject();
 
     return res.json({
-      status: 'succes',
+      status: "succes",
       data: post,
       error: null
     });
   } catch (err) {
     return res.status(400).json({
-      status: 'error',
+      status: "error",
       data: null,
       error: err
     });
@@ -92,16 +95,16 @@ export async function _delete(req, res) {
       creator: req.user._id
     });
 
-    if(!post) return Promise.reject();
+    if (!post) return Promise.reject();
 
     return res.json({
-      status: 'success',
+      status: "success",
       data: post,
       error: null
     });
   } catch (err) {
     return res.status(400).json({
-      status: 'error',
+      status: "error",
       data: null,
       error: err
     });
@@ -111,10 +114,10 @@ export async function _delete(req, res) {
 export async function update(req, res) {
   try {
     let postId = req.params.id;
-    let body = _.pick(req.body, ['']);
+    let body = _.pick(req.body, [""]);
   } catch (err) {
     return res.status(400).json({
-      status: 'error',
+      status: "error",
       data: null,
       error: err
     });
